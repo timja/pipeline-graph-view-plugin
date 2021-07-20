@@ -4,6 +4,8 @@ import { DataTreeView } from './DataTreeView';
 import parse from 'html-react-parser';
 
 import "./pipeline-console.scss";
+import {makeReactChildren, tokenizeANSIString} from "./Ansi";
+import {Linkify} from "./Linkify";
 
 
 interface PipelineConsoleProps {}
@@ -40,6 +42,11 @@ export class PipelineConsole extends React.Component {
           textAlign: 'left'
         }
 
+        const lineChunks = this.state.consoleText.split('\n')
+            .map(tokenizeANSIString)
+            .map(makeReactChildren)
+
+
         return (
           <React.Fragment>
             <div className="App">
@@ -52,7 +59,7 @@ export class PipelineConsole extends React.Component {
                 </div>
                 <div className="console-output">
                     <pre className="console-pane">
-                        {this.state.consoleText}
+                        {React.createElement(Linkify, { options: { className: 'line ansi-color'} }, ...lineChunks)}
                     </pre>
                 </div>
               </SplitPane>
